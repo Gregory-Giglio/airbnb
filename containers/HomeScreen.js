@@ -48,10 +48,14 @@ export default function HomeScreen() {
             data={data}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => {
-              // let stars = [];
-              // for(let i = 1; i<item.ratingValue; i++){
-              //   stars.push(`<Entypo name="star" size={24} color="yellow" />`);
-              // };                     
+              let stars = [];
+              for(let i = 0; i<5; i++){
+                if (i < item.ratingValue) {
+                  stars.push(<Entypo name="star" size={20} color="orange" key={i} />);
+                } else {
+                  stars.push(<Entypo name="star" size={20} color="grey" key={i} />);
+                }
+              };                     
               return (
                 <View style={styles.room}>
                   
@@ -78,57 +82,8 @@ export default function HomeScreen() {
                       >
                         {item.title}
                       </Text>
-                      <View style={styles.row}>                        
-                        {item.ratingValue === 5 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                          </View>
-                        ) : item.ratingValue === 4 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : item.ratingValue === 3 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : item.ratingValue === 2 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        )  : item.ratingValue === 1 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        )
-                      }
+                      <View style={styles.row}>
+                        <Text>{stars}</Text>                        
                         <Text>{item.reviews} reviews</Text>
                       </View>
                     </View>

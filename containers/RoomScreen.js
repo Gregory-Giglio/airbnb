@@ -1,15 +1,18 @@
 import { useRoute } from "@react-navigation/core";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { Entypo } from '@expo/vector-icons'; 
-import { Button, Text, View, ActivityIndicator, StyleSheet, FlatList, Image, TouchableOpacity } from "react-native";
+import { Entypo } from '@expo/vector-icons';
+import Swiper from "react-native-swiper"; 
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import { Button, Text, View, ActivityIndicator, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView } from "react-native";
 
 export default function RoomScreen() {
     const { params } = useRoute();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState();
     const [fullText, setFullText] = useState(false);
-
+    const [stars, setStars] = useState([]);
+    
     
     
     useEffect (() => {
@@ -19,6 +22,16 @@ export default function RoomScreen() {
             setData(response.data);
             setIsLoading(false);
 
+            const tempstars = [];
+            for(let i = 0; i<5; i++){
+              if (i < response.data.ratingValue) {                
+                tempstars.push(<Entypo name="star" size={20} color="orange" key={i} />);
+              } else {
+                tempstars.push(<Entypo name="star" size={20} color="grey" key={i} />);
+              }
+            };
+            setStars(tempstars);
+
         } catch (error) {
             alert(error.response.data.error);
         }
@@ -27,7 +40,7 @@ export default function RoomScreen() {
         fetchData();
     }, []);
 
-
+    
     return (
     <View>
       {isLoading === true ? (
@@ -35,6 +48,7 @@ export default function RoomScreen() {
           <ActivityIndicator size="large" color="#F9585D" style={{ marginTop: 100 }} />
         </View>
       ) : (
+        <ScrollView>
         <View style={styles.main}>
           <View style={styles.viewlogo}>
             <Image
@@ -43,12 +57,25 @@ export default function RoomScreen() {
               resizeMode="contain"
             />
           </View>
-            <View>
-                <Image
-                    source={{uri: data.photos[0].url}}
-                    style={styles.roomimg}
-                    resizeMode="cover"
-                />
+            <View>               
+              
+                <Swiper
+                  style={styles.wrapper}
+                  dotColor="salmon"
+                  activeDotColor="red"
+                  autoplay
+                >
+                  {data.photos.map((slide) => {
+                    return (
+                      <View style={styles.slide} key={slide.picture_id}>
+                        <Image
+                          source={{ uri: slide.url }}
+                          style={{ height: "100%", width: "100%" }}
+                        />
+                      </View>
+                    );
+                  })}
+                </Swiper>                
                 <View style={styles.pricecontainer}>
                     <Text style={styles.price}>{data.price} €</Text>
                 </View>
@@ -61,57 +88,8 @@ export default function RoomScreen() {
                       >
                         {data.title}
                       </Text>
-                      <View style={styles.row}>                        
-                        {data.ratingValue === 5 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                          </View>
-                        ) : data.ratingValue === 4 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : data.ratingValue === 3 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : data.ratingValue === 2 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        )  : data.ratingValue === 1 ? (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="orange" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        ) : (
-                          <View style={styles.row}>
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                            <Entypo name="star" size={20} color="black" />
-                          </View>
-                        )
-                      }
+                      <View style={styles.row}>
+                        <Text>{stars}</Text>                        
                         <Text>{data.reviews} reviews</Text>
                       </View>
                     </View>
@@ -135,7 +113,29 @@ export default function RoomScreen() {
                 </Text>
             </TouchableOpacity>
             
+            <MapView
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            showsUserLocation
+            initialRegion={{
+              latitude: data.location[1],
+              longitude: data.location[0],
+              latitudeDelta: 0.02,
+              longitudeDelta: 0.02,
+            }}
+            >
+              <Marker
+                  
+                  coordinate={{
+                    latitude: data.location[1],
+                    longitude: data.location[0],
+                  }}
+                  
+                />  
+            </MapView>
+
         </View>
+        </ScrollView>
       )}
     </View>
     )
@@ -206,5 +206,19 @@ const styles = StyleSheet.create({
 
     description: {
         paddingHorizontal: 20,
+    },
+
+    wrapper: {
+      height: 300,
+      marginTop: 10,
+    },
+    slide: {
+      height: 300,
+    },
+
+    map: {
+      height: 300,
+      width: "100%",
+      marginVertical: 20,
     },
 })
