@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/core";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
@@ -5,6 +6,7 @@ import * as Location from "expo-location";
 import { Button, Text, View, ActivityIndicator, StyleSheet, FlatList, Image, TouchableOpacity, ScrollView } from "react-native";
 
 export default function RoomScreen() {
+    const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
     const [data, setData] = useState();
     const [latitude, setLatitude] = useState(null);
@@ -90,6 +92,9 @@ export default function RoomScreen() {
                                 }}
                                 title={marker.title}
                                 description={marker.description}
+                                onPress={() => {
+                                  navigation.navigate("Room", { roomId: marker._id });
+                                }}
                             />
                         );
             })}

@@ -37,7 +37,7 @@ export default function SignUpScreen({ setToken }) {
           "password": password
         });
 
-        setToken(response.data.token);
+        setToken(response.data.token, response.data.id);
         alert("You are log in");
 
       } catch (error) {
